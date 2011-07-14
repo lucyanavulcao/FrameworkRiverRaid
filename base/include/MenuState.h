@@ -28,6 +28,7 @@
 #include "CRiverMap.h"
 #include "CFont.h"
 #include "CParticleSystem.h"
+#include <irrKlang.h>
 
 #include <vector>
 #include <cstdlib>
@@ -74,6 +75,8 @@ class MenuState : public CGameState
 
 				CParticleSystem* testeParticulas;
         string BASE_DIR;
+				bool firstTime;
+				irrklang::ISoundSource* initSound;
 
 };
 
