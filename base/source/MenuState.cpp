@@ -14,6 +14,7 @@
 #include "MenuState.h"
 #include "PlayState.h"
 #include "CRiverMap.h"
+#include "CParticleSystem.h"
 
 MenuState MenuState::m_MenuState;
 
@@ -119,6 +120,11 @@ void MenuState::init()
 	fonte->loadFont(nomeArq.c_str(), 112, 208);
 	fonte->setPosition(0,250);
 	fonte->setText("Pressione espaco para comecar");
+
+
+	// Teste
+	testeParticulas = new CParticleSystem();
+	testeParticulas->setStartPos(120,120);
 
 	cout << "MenuState Init Successful" << endl;
 }
@@ -228,7 +234,7 @@ void MenuState::update(CGame* game)
 
 void MenuState::draw(CGame* game)
 {
- 	glClearColor(0.3, 0.3, 0.3, 0);
+	glClearColor(0.3, 0.3, 0.3, 0);
 
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
@@ -248,12 +254,15 @@ void MenuState::draw(CGame* game)
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    mapaFundo->draw();
-    fonte->draw();
-		// FIXME
-		mapaTeste->draw();
-		mapaTeste2->draw();
+	mapaFundo->draw();
+	fonte->draw();
+	// FIXME
+	mapaTeste->draw();
+	mapaTeste2->draw();
 
-    SDL_GL_SwapBuffers();
+	// 
+	testeParticulas->draw();
+
+	SDL_GL_SwapBuffers();
 }
 

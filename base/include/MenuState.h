@@ -27,6 +27,7 @@
 #include "CGameState.h"
 #include "CRiverMap.h"
 #include "CFont.h"
+#include "CParticleSystem.h"
 
 #include <vector>
 #include <cstdlib>
@@ -70,6 +71,8 @@ class MenuState : public CGameState
 				CRiverMap* mapaTeste;
 				CRiverMap* mapaTeste2;
         CFont *fonte;
+
+				CParticleSystem* testeParticulas;
         string BASE_DIR;
 
 };
