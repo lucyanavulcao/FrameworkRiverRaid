@@ -15,7 +15,7 @@
 #include <cmath>
 
 using namespace std;
-
+//cheguei aqui pra fude com tudo gurizada!!!
 // Construtor
 CGame::CGame(int minFrameRate, int maxFrameRate)
 {
