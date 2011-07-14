@@ -163,6 +163,7 @@ void MenuState::handleEvents(CGame* game)
 				switch(event.key.keysym.sym) {
 
 					case SDLK_SPACE:
+						game->getAudioEngine()->stopAllSounds();
 						game->changeState(PlayState::instance());
 						break;
 					case SDLK_ESCAPE:
@@ -183,6 +184,13 @@ void MenuState::handleEvents(CGame* game)
 
 void MenuState::update(CGame* game)
 {
+
+	if(firstTime){
+		firstTime = false;
+		string nomeArqSom = BASE_DIR + "data/audio/AM_Boss2.mp3";
+		initSound = game->getAudioEngine()->addSoundSourceFromFile(nomeArqSom.c_str());
+		game->getAudioEngine()->play2D(initSound,true);
+	}
 	// Faz um teste de animação usando as funções novas
 	// FIXME: remover isto
 	//
