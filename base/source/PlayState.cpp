@@ -48,7 +48,7 @@ void PlayState::CarregaTiles() {
 
 	// TODO: testando se conseguimos criar um array de mapas :P
 	{
-		for(int nIdx = 0; nIdx < 3; nIdx++) {
+		for(int nIdx = 0; nIdx < RR_NUM_ROTATING_MAPS; nIdx++) {
 			// 1 - Arquivo com a descrição do mapa de tiles
 			nomeArq = BASE_DIR + "data/maps/river_raid_base.txt";
 
@@ -93,7 +93,7 @@ void PlayState::CarregaSprites() {
 	m_spritePlayer->setScale(1);
 	m_spritePlayer->setAnimRate(8); // taxa de animaÃ§Ã£o em frames por segundo(troca dos frames dele)
 	m_spritePlayer->setScale(1.0);
-	m_spritePlayer->setPosition(PLAYER_INIT_POS_X,PLAYER_INIT_POS_Y); // FIXME
+	m_spritePlayer->setPosition(RR_PLAYER_INIT_POS_X, RR_PLAYER_INIT_POS_Y); // FIXME
 	// FIXME: adicionar sprite do player com animações
 
 	{
@@ -154,7 +154,9 @@ void PlayState::MontaLayer() {
 	layers = new CLayerHandler(5);
 //	layers->add(mapFundo,0);
 	
-	layers->add(mapLevel[0],0);
+	for(int nIdx = 0; nIdx < RR_NUM_ROTATING_MAPS; nIdx++)
+		layers->add(mapLevel[nIdx],0);
+
 	// FIXME: está com erro no draw do mapa de colisão
 //	layers->add(mapColisao,1);
 	layers->add(m_spritePlayer,1);
@@ -185,6 +187,14 @@ void PlayState::init() {
 	keystate = SDL_GetKeyState(NULL); // get array of key states
 
 	currentFrame = 0;
+
+	// Inicializa a posição dos mapas
+	for(int nIdx = 0; nIdx < RR_NUM_ROTATING_MAPS; nIdx++) {
+
+		mapLevel[nIdx]->setStartPosX(0);
+		mapLevel[nIdx]->setStartPosY(0); // Todos os mapas são iniciados na origem...
+		mapLevel[nIdx]->setOffsetY(RR_RIVER_LEVEL_LENGTH-(RR_RIVER_LEVEL_LENGTH*nIdx)); // ... mas com offsets diferentes. Assim ficam em fila
+	}
 
 	cout << "PlayState Init Successful" << endl;
 }

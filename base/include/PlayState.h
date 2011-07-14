@@ -21,9 +21,19 @@
 #include <SDL_opengl.h>
 #endif
 
-#define	PLAYER_INIT_POS_X			160-16	//FIXME
-#define	PLAYER_INIT_POS_Y			276			//FIXME
 
+#define	RR_TILE_WIDTH						32	// Largura de cada tile que compõe o cenário
+#define	RR_TILE_HEIGHT					32	// Altura de cada tile que compõe o cenário
+#define RR_RIVER_WIDTH					10	// Número de tiles na largura do rio
+#define RR_RIVER_HEIGHT					32	// Número de tiles na altura do rio
+#define RR_RIVER_VISIBLE_HEIGHT	8	// Número de tiles adiante visíveis no rio
+#define RR_RIVER_LEVEL_LENGTH		RR_TILE_HEIGHT*RR_RIVER_HEIGHT	// Para ajudar no posicionamento dos mapas
+
+#define	RR_GAME_WINDOW_WIDTH		RR_TILE_WIDTH*RR_RIVER_WIDTH
+#define	RR_GAME_WINDOW_HEIGHT		RR_TILE_HEIGHT*RR_RIVER_VISIBLE_HEIGHT
+#define	RR_PLAYER_INIT_POS_X		RR_GAME_WINDOW_WIDTH/2-16	//FIXME
+#define	RR_PLAYER_INIT_POS_Y		RR_TILE_HEIGHT			//FIXME
+#define RR_NUM_ROTATING_MAPS		3
 
 #include "CGameState.h"
 #include "CImage.h"
@@ -76,7 +86,7 @@ class PlayState : public CGameState
 		CLayerHandler *layers;
 		CTilesMap *mapFundo;
 		CTilesMap *mapColisao;
-		CRiverMap *mapLevel[3];
+		CRiverMap *mapLevel[RR_NUM_ROTATING_MAPS];
 
 		// Sprites
 		CSprite *m_spritePlayer;	// Sprite com o avião do jogador

@@ -30,11 +30,12 @@ using namespace std;
 #include "MenuState.h"
 
 int main( int argc, char* args[] ) {
-    CGame game(5,30);
 
-	game.init("Jogo Basico com Interface",320,384,0,false);
+	CGame game(5,30);
 
-    game.changeState(MenuState::instance());
+	game.init("River Raid Remake",RR_GAME_WINDOW_WIDTH,RR_GAME_WINDOW_HEIGHT,0,false);
+
+	game.changeState(MenuState::instance());
 
 	while(game.isRunning())
 	{
@@ -46,7 +47,7 @@ int main( int argc, char* args[] ) {
 	// cleanup the engine
 	game.clean();
 
-    return 0;
+	return 0;
 
 }
 
