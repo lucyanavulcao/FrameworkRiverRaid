@@ -2,12 +2,12 @@
  *  CParticleSystem.h
  *
  *  Simula um sistema simples de partículas usando o OPENGL.
- *  Refereências:
+ *  Referências:
  *	http://www.swiftless.com/tutorials/opengl/particles.html
  *	http://snipplr.com/view/54306/opengl-particle-system-smoke-stream/
  *
  * 	Criado por Alexandre Ramos Coelho, julho 2011.
- *
+ *	
  */
 
 #ifndef CPARTICLE_SYSTEM_H
@@ -19,7 +19,7 @@
 #include <SDL_opengl.h>
 #include <SDL_image.h>
 
-#define	MAX_PARTICLES				50
+#define	MAX_PARTICLES				500
 #define MIN_PARTICLES				10
 #define	PARTICLE_DECEL_STEP	.0025	// Mudar o valor desta variável muda completamente o comportamento das partículas
 #define	PARTICLE_ACCEL			((((((8 - 5 + 2) * rand()%11) + 5 - 1 + 1) * rand()%11) + 1) * 0.01)
@@ -57,7 +57,12 @@ class CParticleSystem
 		virtual void draw();
 		void moveParticles(int nAmountOfParticles);
 		void setStartPos(float fPosX, float fPosY);
-
+		void moveParticleSystem(float fOffsetX, float fOffsetY);
+		void moveOriginParticleSystem(float fNewX, float fNewY);
+		float getX();
+		float getY();
+		
+		bool m_bApplyRadius;
 };
 
 #endif  // CPARTICLE_SYSTEM_H

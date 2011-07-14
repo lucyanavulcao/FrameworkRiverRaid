@@ -124,7 +124,7 @@ void MenuState::init()
 
 	// Teste
 	testeParticulas = new CParticleSystem();
-	testeParticulas->setStartPos(120,120);
+	testeParticulas->setStartPos(120,50);
 
 	cout << "MenuState Init Successful" << endl;
 }
@@ -229,6 +229,11 @@ void MenuState::update(CGame* game)
 		mapaTeste->setOffsetY(nOffsetTeste + m_nSpeedY);
 		mapaTeste2->setOffsetY(nOffsetTeste2 + m_nSpeedY);
 	}
+
+	// Teste tosco para mover o sistema de partículas
+	//testeParticulas->moveParticleSystem(0, m_nSpeedY);
+	testeParticulas->moveOriginParticleSystem(testeParticulas->getX(), 
+			testeParticulas->getY()+m_nSpeedY);
 
 }
 
