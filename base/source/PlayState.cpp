@@ -159,12 +159,12 @@ void PlayState::MontaLayer() {
 
 	// FIXME: está com erro no draw do mapa de colisão
 //	layers->add(mapColisao,1);
-	layers->add(m_spritePlayer,1);
+	layers->add(m_spritePlayer,2);
 
 	layers->add(m_spriteShip,1);	// Adiciona o sprite do barco aos layers
 	layers->add(m_spriteChopper,1);	// Adiciona o sprite do helicóptero aos layers
 	layers->add(m_spriteJetplane,1);	// Adiciona o sprite do avião inimigo aos layers
-	layers->add(m_spriteNuvem,2);
+	layers->add(m_spriteNuvem,3);
 }
 
 /*****************************************************************************************/
@@ -195,6 +195,10 @@ void PlayState::init() {
 		mapLevel[nIdx]->setStartPosY(0); // Todos os mapas são iniciados na origem...
 		mapLevel[nIdx]->setOffsetY(RR_RIVER_LEVEL_LENGTH-(RR_RIVER_LEVEL_LENGTH*nIdx)); // ... mas com offsets diferentes. Assim ficam em fila
 	}
+
+	// Inicializa as variáveis do jogo
+	m_lnPlayerScore = 0;
+	m_nLevel = 0;	// Primeira fase
 
 	cout << "PlayState Init Successful" << endl;
 }
