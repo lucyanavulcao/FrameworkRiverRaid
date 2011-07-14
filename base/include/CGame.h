@@ -14,6 +14,7 @@
 #include <SDL.h>
 #include <SDL_opengl.h>
 #include <stack>
+#include <irrKlang.h>
 
 class CGameState;
 
@@ -49,6 +50,8 @@ class CGame
         float getWidth();
         float getHeight();
 
+				irrklang::ISoundEngine* getAudioEngine() { return audioEngine;}
+
     private:
 
         SDL_Surface* screen;
@@ -68,6 +71,7 @@ class CGame
         double maxCyclesPerFrame;
         double lastFrameTime;
         double cyclesLeftOver;
+				irrklang::ISoundEngine* audioEngine;
 };
 
 #endif
