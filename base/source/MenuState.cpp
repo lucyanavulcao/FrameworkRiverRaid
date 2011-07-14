@@ -231,9 +231,9 @@ void MenuState::update(CGame* game)
 	}
 
 	// Teste tosco para mover o sistema de partículas
-	//testeParticulas->moveParticleSystem(0, m_nSpeedY);
-	testeParticulas->moveOriginParticleSystem(testeParticulas->getX(), 
-			testeParticulas->getY()+m_nSpeedY);
+	testeParticulas->moveParticleSystem(0, m_nSpeedY);
+	//testeParticulas->moveOriginParticleSystem(testeParticulas->getX(), 
+	//		testeParticulas->getY()+m_nSpeedY);
 
 }
 
