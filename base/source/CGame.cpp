@@ -13,6 +13,7 @@
 #include <iostream>
 #include <assert.h>
 #include <cmath>
+#include <irrKlang.h>
 
 using namespace std;
 
@@ -70,7 +71,7 @@ void CGame::init(const char* title, int width, int height, int bpp, bool fullscr
 	running = true;
 
     printAttributes();
-
+	audioEngine = irrklang::createIrrKlangDevice();
 	printf("Game Initialised Succesfully\n");
 }
 
