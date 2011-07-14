@@ -22,6 +22,8 @@ void PlayState::CarregaTiles() {
 	// Carrega o mapa de teste
 	string nomeArq = BASE_DIR + "data/maps/river_raid_base.txt";
 
+	// Comentando o antigo mapFundo...
+	/*
 	mapFundo = new CTilesMap();
 	ret = mapFundo->loadMap(nomeArq.c_str());
 	if (!ret) {
@@ -41,6 +43,7 @@ void PlayState::CarregaTiles() {
 		cout << "Arquivo de tiles ("<< nomeArq << ") não existe." ;
 		return;
 	}
+*/
 
 
 	// TODO: testando se conseguimos criar um array de mapas :P
