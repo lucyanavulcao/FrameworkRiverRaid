@@ -1,0 +1,139 @@
+class CGame
+!!!128642.cpp!!!	CGame(in minFrameRate : int = 15, in maxFrameRate : int = 20)
+    this->minFrameRate = minFrameRate;
+    this->maxFrameRate = maxFrameRate;
+    updateInterval = 1.0 / maxFrameRate*1000;
+    cout << "Update interval: " << updateInterval << endl;
+    maxCyclesPerFrame = (double) maxFrameRate / minFrameRate;
+    lastFrameTime = 0;
+    cyclesLeftOver = 0;
+!!!128770.cpp!!!	init(in title : char, in width : int, in height : int, in bpp : int, in fullscreen : bool) : void
+    flags = SDL_OPENGL | SDL_RESIZABLE;
+    this->bpp = bpp;
+
+	// initialize SDL
+	SDL_Init(SDL_INIT_EVERYTHING);
+
+	// set the title bar text
+	SDL_WM_SetCaption(title, title);
+
+	if ( fullscreen ) {
+		flags |= SDL_FULLSCREEN;
+	}
+
+    // Request double-buffered OpenGL
+    SDL_GL_SetAttribute (SDL_GL_DOUBLEBUFFER, 1);
+
+    // Request 16 bit depth buffer - not used
+    //value = 16;
+    //SDL_GL_SetAttribute (SDL_GL_DEPTH_SIZE, value);
+
+	// create the screen surface
+	screen = SDL_SetVideoMode(width, height, bpp, flags);
+
+    // Enable transparency through blending
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    // Setup 2D projection
+    glMatrixMode( GL_PROJECTION );
+    glLoadIdentity();
+    glOrtho(0.0f, width, height, 0.0f, -1.0f, 1.0f);
+    glMatrixMode( GL_MODELVIEW );
+    glLoadIdentity();
+
+    // Setup viewport
+    glViewport(0,0,width,height);
+
+	this->fullscreen = fullscreen;
+
+	running = true;
+
+    printAttributes();
+	printf("Game Initialised Succesfully\n");
+!!!128898.cpp!!!	handleEvents() : void
+    states.top()->handleEvents(this);
+!!!129026.cpp!!!	changeState(inout state : CGameState) : void
+    // cleanup the current state
+    if ( !states.empty() ) {
+        states.top()->cleanup();
+        states.pop();
+    }
+
+    // store and init the new state
+    states.push(state);
+    states.top()->init();
+!!!129154.cpp!!!	pushState(inout state : CGameState) : void
+	// pause current state
+	if ( !states.empty() ) {
+		states.top()->pause();
+	}
+
+	// store and init the new state
+	states.push(state);
+	states.top()->init();
+!!!129282.cpp!!!	popState() : void
+	// cleanup the current state
+	if ( !states.empty() ) {
+		states.top()->cleanup();
+		states.pop();
+	}
+
+	// resume previous state
+	if ( !states.empty() ) {
+		states.top()->resume();
+	}
+!!!129410.cpp!!!	update() : void
+    double currentTime, updateIterations;
+    
+    currentTime = SDL_GetTicks();
+    updateIterations = ((currentTime - lastFrameTime) + cyclesLeftOver);
+    
+    if (updateIterations > maxCyclesPerFrame * updateInterval) {
+        updateIterations = maxCyclesPerFrame * updateInterval;
+    }
+    
+    int cont = 1;
+    while(updateIterations > updateInterval) {
+        updateIterations -= updateInterval;
+        //cout << "updating " << cont++ << endl;
+        if ( !states.empty() )
+            states.top()->update(this);
+    }
+    cyclesLeftOver = updateIterations;
+    lastFrameTime = currentTime;
+!!!129538.cpp!!!	draw() : void
+    // let the state draw the screen
+	states.top()->draw(this);
+    //cout << "draw" << endl;
+    //SDL_GL_SwapBuffers();
+!!!129666.cpp!!!	clean() : void
+    while ( !states.empty() ) {
+		states.top()->cleanup();
+		states.pop();
+	}
+    SDL_Quit();
+!!!130050.cpp!!!	resize(in w : int, in h : int) : void
+    screen = SDL_SetVideoMode(w, h, bpp, flags);
+    if(screen == NULL)
+        exit(1);
+    glViewport(0,0,screen->w,screen->h);
+!!!130306.cpp!!!	printAttributes() : void
+    int nAttr;
+    int i;
+
+    SDL_GLattr attr[] = { SDL_GL_RED_SIZE, SDL_GL_BLUE_SIZE, SDL_GL_GREEN_SIZE,
+                    SDL_GL_ALPHA_SIZE, SDL_GL_BUFFER_SIZE, SDL_GL_DEPTH_SIZE };
+
+    char *desc[] = { "Red size: %d bits\n", "Blue size: %d bits\n", "Green size: %d bits\n",
+                     "Alpha size: %d bits\n", "Color buffer size: %d bits\n",
+                     "Depth bufer size: %d bits\n" };
+
+    nAttr = sizeof(attr) / sizeof(int);
+
+    for (i = 0; i < nAttr; i++) {
+
+        int value;
+        SDL_GL_GetAttribute (attr[i], &value);
+        printf (desc[i], value);
+    }

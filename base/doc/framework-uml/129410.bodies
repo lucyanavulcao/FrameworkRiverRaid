@@ -1,0 +1,28 @@
+class TextureManager
+!!!140802.cpp!!!	~TextureManager()
+    //dtor
+    cout << "~TextureManager: " << imgs.size() << endl;
+    map<string,GLuint>::iterator it = imgs.begin();
+    while(it != imgs.end())
+    {
+        GLuint tex = (*it).second;
+        cout << tex << endl;
+        glDeleteTextures(1, &tex);
+        it++;
+    }
+!!!140930.cpp!!!	findTexture(inout nomeArq : char) : GLuint
+    GLuint tex;
+    if(imgs.find(nomeArq) == imgs.end()) {
+        cout << "New texture: " << nomeArq << endl;
+        // New texture, generate texture id
+        glGenTextures(1, &tex);
+        imgs[nomeArq] = tex;
+        return -1;
+    }
+    // Return texture id
+    cout << "Existing texture: " << imgs[nomeArq] << endl;
+    return imgs[nomeArq];
+!!!141058.cpp!!!	setDefaultImageDir(inout dir : char) : void
+    defaultImageDir = dir;
+!!!141314.cpp!!!	TextureManager()
+    defaultImageDir = "data/pix";

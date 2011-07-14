@@ -1,0 +1,69 @@
+class CSprite
+!!!135426.cpp!!!	CSprite()
+
+
+!!!135554.cpp!!!	~CSprite()
+
+    //dtor
+!!!135682.cpp!!!	loadSprite(in nomeArq : char, in w : int, in h : int, in hSpace : int, in vSpace : int, in xIni : int, in yIni : int, in column : int, in row : int, in total : int) : bool
+
+    if(!loadMultiImage(nomeArq,w,h,hSpace,vSpace,xIni,yIni,column,row,total))
+        return false;
+
+	// Init animation vars
+	//xdelay = 0;
+	//ydelay = 0;
+	xspeed = 0;
+	yspeed = 0;
+	//xcount = 0;
+	//ycount = 0;
+	curframe = 0;
+    curFrameD = 0;
+
+	return true;
+!!!135810.cpp!!!	setSpeedX(in xspeed : double) : void
+
+	this->xspeed = xspeed;
+!!!135938.cpp!!!	setSpeedY(in yspeed : double) : void
+
+	this->yspeed = yspeed;
+!!!136066.cpp!!!	setCurrentFrame(in c : int) : void
+
+	if ( c>=0 && c<totalFrames )
+		curframe = c;
+	else
+		curframe = 0;
+!!!136194.cpp!!!	frameForward() : void
+
+	curframe++;
+	if (curframe >= totalFrames)
+		curframe--;
+!!!136322.cpp!!!	frameBack() : void
+
+	curframe--;
+	if (curframe < 0)
+		curframe = 0;
+!!!136450.cpp!!!	setAnimRate(in fdelay : int) : void
+
+	if (fdelay >= 0)
+		framedelay = fdelay;
+	else
+		framedelay = 0;
+    
+    // Reset framecount so next draw will work as it should be
+    framecount = 0;
+!!!136578.cpp!!!	update(in updateInterval : double) : void
+
+    // Move sprite according to its speed and the amount of time that has passed
+    x += xspeed/1000*updateInterval;
+    y += yspeed/1000*updateInterval;
+
+    curFrameD += (double)framedelay/1000*updateInterval;
+    curframe = (int) curFrameD;
+    if(curframe >= totalFrames) {
+        curFrameD = 0;
+        curframe = 0;
+    }
+!!!136706.cpp!!!	draw() : void
+
+    drawFrame(curframe);

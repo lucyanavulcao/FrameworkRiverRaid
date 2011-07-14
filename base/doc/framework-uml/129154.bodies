@@ -1,0 +1,40 @@
+class PauseState
+!!!138498.cpp!!!	init() : void
+    pauseSprite = new CImage();
+    pauseSprite->loadImage("paused.png");
+    pauseSprite->setPosition(150,150);
+    pauseFont = new CFont();
+    pauseFont->loadFont("data/fonts/lucida12.png", 112, 208);
+    cout << "PauseState Init Successful" << endl;
+!!!138626.cpp!!!	cleanup() : void
+    delete pauseSprite;
+	cout << "PauseState Clean Successful" << endl;
+!!!139010.cpp!!!	handleEvents(inout game : CGame) : void
+	SDL_Event event;
+
+	if (SDL_PollEvent(&event)) {
+		switch (event.type) {
+			case SDL_QUIT:
+				game->quit();
+				break;
+
+            case SDL_KEYDOWN:
+				switch(event.key.keysym.sym){
+                    case SDLK_SPACE:
+                        game->popState();
+                        break;
+                    case SDLK_ESCAPE:
+                        game->quit();
+                        break;
+				}
+		}
+	}
+!!!139266.cpp!!!	draw(inout game : CGame) : void
+    glClearColor(0,0,1,1); // blue
+    glClear(GL_COLOR_BUFFER_BIT);
+    glLoadIdentity();
+    pauseSprite->setScale(2);
+    pauseSprite->draw();
+    glLoadIdentity();
+    pauseFont->draw(100,100,"This is a test");
+    SDL_GL_SwapBuffers();

@@ -1,0 +1,71 @@
+class PlayState
+!!!139650.cpp!!!	init() : void
+	playSprite1 = new CSprite();
+    playSprite2 = new CSprite();
+	//playSprite->loadSprite("player.png", 36, 44, 0, 0, 0, 0, 7, 1, 7);
+	//playSprite->loadSprite("char2.png", 128,128,0,0,0,53,4,2,7);
+	//playSprite->loadSprite("char4.png",128,128,0,0,0,21,4,3,10);
+	playSprite1->loadSprite("char9.png",128,128,0,0,0,40,4,2,6);
+	playSprite1->setPosition(10,100);
+	playSprite1->setAnimRate(30);        // quadros/segundo
+	playSprite1->setSpeedX(200);         // pixels/segundo
+    playSprite2->loadSprite("char9.png",128,128,0,0,0,40,4,2,6);
+	playSprite2->setPosition(10,300);
+	playSprite2->setAnimRate(10);        // quadros/segundo
+	playSprite2->setSpeedX(30);         // pixels/segundo
+    dir = 1; // direção: para a direita
+	cout << "PlayState Init Successful" << endl;
+!!!139778.cpp!!!	cleanup() : void
+    delete playSprite1;
+    delete playSprite2;
+	cout << "PlayState Clean Successful" << endl;
+!!!139906.cpp!!!	pause() : void
+	cout << "PlayState Paused" << endl;
+!!!140034.cpp!!!	resume() : void
+	cout << "PlayState Resumed" << endl;
+!!!140162.cpp!!!	handleEvents(inout game : CGame) : void
+	SDL_Event event;
+
+	while (SDL_PollEvent(&event)) {
+		switch (event.type) {
+			case SDL_QUIT:
+				game->quit();
+				break;
+
+            case SDL_KEYDOWN:
+				switch(event.key.keysym.sym){
+                    case SDLK_SPACE:
+                        game->pushState(PauseState::instance());
+                        break;
+                    case SDLK_ESCAPE:
+                        game->quit();
+                        break;
+                    case SDLK_RIGHT:
+                        dir = 1;
+                        playSprite1->setSpeedX(200);//fabs(playSprite1->getXspeed()));
+                        playSprite1->setMirror(false);
+                        break;
+                    case SDLK_LEFT:
+                        dir = -1;
+                        playSprite1->setSpeedX(-200); //fabs(playSprite1->getXspeed()));
+                        playSprite1->setMirror(true);
+                        break;
+                }
+            case SDL_VIDEORESIZE:
+                game->resize(event.resize.w, event.resize.h);
+		}
+	}
+!!!140290.cpp!!!	update(inout game : CGame) : void
+    playSprite1->update(game->getUpdateInterval());
+    playSprite2->update(game->getUpdateInterval());
+!!!140418.cpp!!!	draw(inout game : CGame) : void
+    glClearColor(0.8,0.8,0.8,1); // light gray
+    glClear(GL_COLOR_BUFFER_BIT);
+    glLoadIdentity();
+    playSprite1->setRotation(0);
+    playSprite1->setScale(1);
+    playSprite1->draw();
+    playSprite2->setRotation(0);
+    playSprite2->setScale(1);
+    playSprite2->draw();
+    SDL_GL_SwapBuffers();

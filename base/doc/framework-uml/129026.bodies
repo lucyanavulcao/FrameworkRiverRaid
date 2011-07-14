@@ -1,0 +1,39 @@
+class MenuState
+!!!137346.cpp!!!	init() : void
+	menuSprite = new CImage();
+	menuSprite->loadImage("menu.png"); // load menu state bitmap
+	cout << "MenuState Init Successful" << endl;
+!!!137474.cpp!!!	cleanup() : void
+    delete menuSprite;
+	cout << "MenuState Cleanup Successful" << endl;
+!!!137602.cpp!!!	pause() : void
+	cout << "MenuState Paused" << endl;
+!!!137730.cpp!!!	resume() : void
+	cout << "MenuState Resumed" << endl;
+!!!137858.cpp!!!	handleEvents(inout game : CGame) : void
+	SDL_Event event;
+
+    if (SDL_PollEvent(&event)) {
+		switch (event.type) {
+			case SDL_QUIT:
+				game->quit();
+				break;
+
+			case SDL_KEYDOWN:
+                switch(event.key.keysym.sym) {
+
+                    case SDLK_SPACE:
+                        game->changeState(PlayState::instance());
+                        break;
+                    case SDLK_ESCAPE:
+                        game->quit();
+                        break;
+                }
+		}
+	}
+!!!138114.cpp!!!	draw(inout game : CGame) : void
+    glClearColor(0.6,0.6,0.6,1); // gray
+    glClear(GL_COLOR_BUFFER_BIT);
+    menuSprite->setPosition(50,50);
+    menuSprite->draw();
+    SDL_GL_SwapBuffers();
