@@ -126,6 +126,7 @@ void MenuState::init()
 	testeParticulas = new CParticleSystem();
 	testeParticulas->setStartPos(120,50);
 
+	firstTime = true;
 	cout << "MenuState Init Successful" << endl;
 }
 
