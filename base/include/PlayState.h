@@ -111,7 +111,7 @@ class PlayState : public CGameState
 
 		int currentFrame;
 		bool done;
-
+    bool firstTime;
 		string BASE_DIR;
 		irrklang::ISoundSource* initSound;
 
