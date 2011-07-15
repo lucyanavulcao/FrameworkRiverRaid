@@ -199,6 +199,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\..\source\CParticleSystem.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\..\source\CRiverMap.cpp"
 				>
 			</File>
@@ -266,6 +270,10 @@
 			</File>
 			<File
 				RelativePath="..\..\..\..\include\CMultiImage.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\include\CParticleSystem.h"
 				>
 			</File>
 			<File
