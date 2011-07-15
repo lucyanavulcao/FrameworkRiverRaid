@@ -78,6 +78,47 @@ void PlayState::CarregaTiles() {
 
 }
 
+
+/*****************************************************************************************/
+/*
+ * @brief		Função que cuida de fazer o scroll e rotacionar os mapas de cenário
+ * @param		nOffset		Deslocamento para todos os mapas
+ * @return	void
+ */
+void PlayState::MoveRotatingMaps(int nOffset) {
+
+	int nOffsetNow[RR_NUM_ROTATING_MAPS];
+
+	// Primeiro, obtém os valores de offset de cada um dos mapas
+	for(int nIdx = 0; nIdx < RR_NUM_ROTATING_MAPS; nIdx++) {
+		nOffsetNow[nIdx] = mapLevel[nIdx]->getOffsetY();
+	}
+
+	// Processa os offsets, verificando se algum dos mapas saiu da janela. Se saiu, faz a devida rotação
+	// FIXME: ALERTA DE TOSQUICE!!! Melhor esse código, usar o define RR_NUM_ROTATING_MAPS
+	if(nOffsetNow[0] >= RR_RIVER_LEVEL_LENGTH) { // Level saiu da janela...
+		nOffsetNow[0] = 0;
+		nOffsetNow[1] = -RR_RIVER_LEVEL_LENGTH;
+		nOffsetNow[2] = -RR_RIVER_LEVEL_LENGTH * 2;
+	} else
+	if(nOffsetNow[1] >= RR_RIVER_LEVEL_LENGTH) { // Level saiu da janela...
+		nOffsetNow[1] = 0;
+		nOffsetNow[2] = -RR_RIVER_LEVEL_LENGTH;
+		nOffsetNow[0] = -RR_RIVER_LEVEL_LENGTH * 2;
+	} else
+	if(nOffsetNow[2] >= RR_RIVER_LEVEL_LENGTH) { // Level saiu da janela...
+		nOffsetNow[2] = 0;
+		nOffsetNow[0] = -RR_RIVER_LEVEL_LENGTH;
+		nOffsetNow[1] = -RR_RIVER_LEVEL_LENGTH * 2;
+	} 
+	
+	// Faz a movimentação dos mapas
+	for(int nIdx = 0; nIdx < RR_NUM_ROTATING_MAPS; nIdx++) {
+
+		mapLevel[nIdx]->setOffsetY(nOffsetNow[nIdx] + nOffset);
+	}
+}
+
 /*****************************************************************************************/
 /*
  * @brief		Faz o carregamento dos sprites do jogo, que devem estar na pasta bin/data/img/
@@ -199,6 +240,7 @@ void PlayState::init() {
 	// Inicializa as variáveis do jogo
 	m_lnPlayerScore = 0;
 	m_nLevel = 0;	// Primeira fase
+	m_nPlayerSpeed = 1; // FIXME: a velocidade inicial do avião não será controlada assim...
 
 	cout << "PlayState Init Successful" << endl;
 }
@@ -268,11 +310,16 @@ void PlayState::handleEvents(CGame* game) {
 	}// end of message processing
 
 	if (keystate[SDLK_UP]==1) {
-		// FIXME: não fazer mais o pan de câmera e sim aumentar a velocidade do avião
+
+		m_nPlayerSpeed += 2;
+
+		if(m_nPlayerSpeed > RR_PLAYER_MAX_SPEED)
+			m_nPlayerSpeed = RR_PLAYER_MAX_SPEED;
+
 		// Movimenta o avião e faz o pan da câmera, movendo também o cenário
-		m_spritePlayer->setY(m_spritePlayer->getY()-2);
-		game->setYpan(game->getYpan()-2);
-		game->updateCamera();
+		//m_spritePlayer->setY(m_spritePlayer->getY()-m_nPlayerSpeed);
+		//game->setYpan(game->getYpan()-2);
+		//game->updateCamera();
 
 		/*game->setZoom(game->getZoom()+1);
 			game->updateCamera();*/
@@ -280,11 +327,16 @@ void PlayState::handleEvents(CGame* game) {
 
 	if (keystate[SDLK_DOWN]==1) {
 
+		// FIXME: corrigir, a parte de velocidade não é tão simples assim
+		m_nPlayerSpeed -= 2;
+		if(m_nPlayerSpeed <=1)
+			m_nPlayerSpeed = 1;
+
 		// FIXME: não fazer mais o pan de câmera e sim diminuir a velocidade do avião
 		// Movimenta o avião e faz o pan da câmera, movendo também o cenário
-		m_spritePlayer->setY(m_spritePlayer->getY()+2);
-		game->setYpan(game->getYpan()+2);
-		game->updateCamera();
+		//m_spritePlayer->setY(m_spritePlayer->getY()+2);
+		//game->setYpan(game->getYpan()+2);
+		//game->updateCamera();
 		/*game->setZoom(game->getZoom()-1);
 		game->updateCamera();*/
 	}
@@ -325,9 +377,13 @@ void PlayState::update(CGame* game) {
 	m_spriteChopper->update(game->getUpdateInterval());
 
 
-	game->setXpan(m_spritePlayer->getX() - game->getWidth()/2);
-	game->updateCamera();
+	//game->setXpan(m_spritePlayer->getX() - game->getWidth()/2);
+	//game->updateCamera();
+	
+	// Move os mapas
+	MoveRotatingMaps(m_nPlayerSpeed);
 
+	
 	// Chama a função de desenho de cada layer
 	layers->draw();
 

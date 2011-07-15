@@ -38,6 +38,8 @@
 #define	RR_PLAYER_INIT_POS_Y		RR_TILE_HEIGHT*RR_RIVER_VISIBLE_HEIGHT-(2*RR_TILE_HEIGHT)			//FIXME
 #define RR_NUM_ROTATING_MAPS		3
 
+#define RR_PLAYER_MAX_SPEED			10
+
 #include "CGameState.h"
 #include "CImage.h"
 #include "CSprite.h"
@@ -83,6 +85,7 @@ class PlayState : public CGameState
 		void MontaLayer();
 		bool TemColisaoSpriteTile(CSprite *sprite, CTilesMap *map);
 		void CriaMapDeColisao();
+		void MoveRotatingMaps(int nOffset);
 
 	private:
 		static PlayState m_PlayState;
