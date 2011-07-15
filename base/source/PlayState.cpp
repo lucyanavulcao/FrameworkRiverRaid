@@ -50,7 +50,10 @@ void PlayState::CarregaTiles() {
 	{
 		for(int nIdx = 0; nIdx < RR_NUM_ROTATING_MAPS; nIdx++) {
 			// 1 - Arquivo com a descrição do mapa de tiles
-			nomeArq = BASE_DIR + "data/maps/river_raid_base.txt";
+			if(nIdx)
+				nomeArq = BASE_DIR + "data/maps/river_raid_base.txt";
+			else
+				nomeArq = BASE_DIR + "data/maps/river_raid_level_0.txt";
 
 			mapLevel[nIdx] = new CRiverMap();
 			// Carrega o mapa
@@ -94,22 +97,33 @@ void PlayState::MoveRotatingMaps(int nOffset) {
 		nOffsetNow[nIdx] = mapLevel[nIdx]->getOffsetY();
 	}
 
+	// FIXME: a rotação dos mapas não está ok! Corrigir!
+
 	// Processa os offsets, verificando se algum dos mapas saiu da janela. Se saiu, faz a devida rotação
-	// FIXME: ALERTA DE TOSQUICE!!! Melhor esse código, usar o define RR_NUM_ROTATING_MAPS
+	// FIXME: ALERTA DE TOSQUICE!!! Melhorar esse código, usar o define RR_NUM_ROTATING_MAPS
 	if(nOffsetNow[0] >= RR_RIVER_LEVEL_LENGTH) { // Level saiu da janela...
 		nOffsetNow[0] = 0;
 		nOffsetNow[1] = -RR_RIVER_LEVEL_LENGTH;
 		nOffsetNow[2] = -RR_RIVER_LEVEL_LENGTH * 2;
+		// DEBUG
+		printf("Trocando mapa 0 - %d/%d/%d\n", 
+				nOffsetNow[0],nOffsetNow[1],nOffsetNow[2]);
 	} else
 	if(nOffsetNow[1] >= RR_RIVER_LEVEL_LENGTH) { // Level saiu da janela...
 		nOffsetNow[1] = 0;
 		nOffsetNow[2] = -RR_RIVER_LEVEL_LENGTH;
 		nOffsetNow[0] = -RR_RIVER_LEVEL_LENGTH * 2;
+		// DEBUG
+		printf("Trocando mapa 1 - %d/%d/%d\n", 
+				nOffsetNow[0],nOffsetNow[1],nOffsetNow[2]);
 	} else
 	if(nOffsetNow[2] >= RR_RIVER_LEVEL_LENGTH) { // Level saiu da janela...
 		nOffsetNow[2] = 0;
 		nOffsetNow[0] = -RR_RIVER_LEVEL_LENGTH;
 		nOffsetNow[1] = -RR_RIVER_LEVEL_LENGTH * 2;
+		// DEBUG
+		printf("Trocando mapa 2 - %d/%d/%d\n", 
+				nOffsetNow[0],nOffsetNow[1],nOffsetNow[2]);
 	} 
 	
 	// Faz a movimentação dos mapas
@@ -235,6 +249,8 @@ void PlayState::init() {
 		mapLevel[nIdx]->setStartPosX(0);
 		mapLevel[nIdx]->setStartPosY(0); // Todos os mapas são iniciados na origem...
 		mapLevel[nIdx]->setOffsetY(RR_RIVER_LEVEL_LENGTH-(RR_RIVER_LEVEL_LENGTH*nIdx)); // ... mas com offsets diferentes. Assim ficam em fila
+		// DEBUG
+		printf("Adicionando mapa %d com offset %d\n", nIdx, mapLevel[nIdx]->getOffsetY());
 	}
 
 	// Inicializa as variáveis do jogo
