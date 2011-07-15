@@ -218,7 +218,7 @@ void PlayState::init() {
 #ifdef _MSC_VER
 	BASE_DIR = "../../../../bin/"; // Visual Studio
 #endif
-
+  firstTime = true;
 	CarregaTiles();
 	CarregaSprites();
 	MontaLayer();
@@ -288,6 +288,7 @@ void PlayState::handleEvents(CGame* game) {
 		case SDL_KEYDOWN:
 			// exit if ESCAPE is pressed
 			if (event.key.keysym.sym == SDLK_ESCAPE) {
+				game->getAudioEngine()->stopAllSounds();
 				done = true;
 				game->quit();
 				break;
@@ -370,6 +371,13 @@ void PlayState::handleEvents(CGame* game) {
 
 /*****************************************************************************************/
 void PlayState::update(CGame* game) {
+
+	if(firstTime){
+		firstTime = false;
+		string nomeArqSom = BASE_DIR + "data/audio/AM_Countryside.mp3";
+		initSound = game->getAudioEngine()->addSoundSourceFromFile(nomeArqSom.c_str());
+		game->getAudioEngine()->play2D(initSound,true);
+	}
 
 	m_spritePlayer->update(game->getUpdateInterval());
 

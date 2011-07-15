@@ -48,6 +48,7 @@
 #include "CFont.h"
 #include "CTiro.h"
 #include "CRiverMap.h"
+#include <irrKlang.h>
 
 #include <vector>
 #include <cstdlib>
@@ -112,7 +113,7 @@ class PlayState : public CGameState
 		bool done;
 
 		string BASE_DIR;
-
+		irrklang::ISoundSource* initSound;
 
 };
 
