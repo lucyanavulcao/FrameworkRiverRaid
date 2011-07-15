@@ -15,7 +15,7 @@
 PlayState PlayState::m_PlayState;
 
 using namespace std;
-
+//alteracao no inicio para testar
 /*****************************************************************************************/
 void PlayState::CarregaTiles() {
 	bool ret;
