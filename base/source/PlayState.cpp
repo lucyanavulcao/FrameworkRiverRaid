@@ -21,6 +21,38 @@ void PlayState::CarregaTiles() {
 	bool ret;
 	// Carrega o mapa de teste
 	string nomeArq = BASE_DIR + "data/maps/river_raid_base.txt";
+	// TODO: testando se conseguimos criar um array de mapas :P
+	{
+		for(int nIdx = 0; nIdx < RR_NUM_ROTATING_MAPS; nIdx++) {
+			// 1 - Arquivo com a descrição do mapa de tiles
+			if(nIdx)
+				nomeArq = BASE_DIR + "data/maps/river_raid_base.txt";
+			else
+				nomeArq = BASE_DIR + "data/maps/river_raid_level_0.txt";
+
+			mapLevel[nIdx] = new CRiverMap();
+			// Carrega o mapa
+			ret = mapLevel[nIdx]->loadMap(nomeArq.c_str());
+			if (!ret) {
+				cout << "Arquivo de mapa ("<< nomeArq << ") não existe." ;
+				return;
+			}
+
+			// 2 - arquivo com o conjunto de figuras 
+			nomeArq = BASE_DIR + "data/maps/river_raid_tiles.png";
+			ret = mapLevel[nIdx]->loadTileMap(nomeArq.c_str(),
+					32, 32,		// int w, int h,
+					0, 0, 		// int hSpace, int vSpace,
+					0, 0, 		// int xIni, int yIni,
+					8, 6, 	// int column, int row,
+					48);		// int total
+
+			if (!ret) {
+				cout << "Arquivo de tiles ("<< nomeArq << ") não existe." ;
+				return;
+			}
+		}
+	}
 
 	// Comentando o antigo mapFundo...
 	/*
@@ -46,18 +78,18 @@ void PlayState::CarregaTiles() {
 */
 
 
-	// TODO: testando se conseguimos criar um array de mapas :P
 	{
-		for(int nIdx = 0; nIdx < RR_NUM_ROTATING_MAPS; nIdx++) {
-			// 1 - Arquivo com a descrição do mapa de tiles
-			if(nIdx)
-				nomeArq = BASE_DIR + "data/maps/river_raid_base.txt";
-			else
-				nomeArq = BASE_DIR + "data/maps/river_raid_level_0.txt";
 
-			mapLevel[nIdx] = new CRiverMap();
+		for(int nIdx = 0; nIdx < RR_RIVER_SCREEN_SLICES; nIdx++) {
+
+			// Carrega uma linha básica de tiles, só por questão de inicialização
+			// DEBUG
+		nomeArq = BASE_DIR + "data/maps/river_raid_slice_base.txt";
+			printf("Slice %d\n", nIdx);
+			mapSlice[nIdx] = new CRiverMap();
+
 			// Carrega o mapa
-			ret = mapLevel[nIdx]->loadMap(nomeArq.c_str());
+			ret = mapSlice[nIdx]->loadMap(nomeArq.c_str());
 			if (!ret) {
 				cout << "Arquivo de mapa ("<< nomeArq << ") não existe." ;
 				return;
@@ -65,12 +97,12 @@ void PlayState::CarregaTiles() {
 
 			// 2 - arquivo com o conjunto de figuras 
 			nomeArq = BASE_DIR + "data/maps/river_raid_tiles.png";
-			ret = mapLevel[nIdx]->loadTileMap(nomeArq.c_str(),
+			ret = mapSlice[nIdx]->loadTileMap(nomeArq.c_str(),
 					32, 32,		// int w, int h,
 					0, 0, 		// int hSpace, int vSpace,
 					0, 0, 		// int xIni, int yIni,
-					8, 4, 	// int column, int row,
-					32);		// int total
+					8, 6, 	// int column, int row,
+					48);		// int total
 
 			if (!ret) {
 				cout << "Arquivo de tiles ("<< nomeArq << ") não existe." ;
@@ -78,6 +110,7 @@ void PlayState::CarregaTiles() {
 			}
 		}
 	}
+
 
 }
 
@@ -90,7 +123,39 @@ void PlayState::CarregaTiles() {
  */
 void PlayState::MoveRotatingMaps(int nOffset) {
 
-	int nOffsetNow[RR_NUM_ROTATING_MAPS];
+	// TODO: ok, vamos rotacionar por enquanto somente dados do primeiro mapa
+	
+	int nOffsetNow[RR_RIVER_SCREEN_SLICES]; // FIXME: Acho que na verdade só precisamos de 2
+
+	for(int nIdx = 0; nIdx < RR_RIVER_SCREEN_SLICES; nIdx++) {
+
+		nOffsetNow[nIdx] = mapSlice[nIdx]->getOffsetY();
+		
+		if(nOffsetNow[nIdx] >= RR_GAME_WINDOW_HEIGHT) { // Slice saiu da janela, então volta para o ínicio da fila
+			
+			// DEBUG
+			printf("trocando %d! ", nIdx);
+			// Reposiciona a slice no início da fila
+			int nExcesso = nOffsetNow[nIdx] - RR_GAME_WINDOW_HEIGHT; // Quantos pixels eu passei do fim da tela?
+			nOffsetNow[nIdx] = -RR_TILE_HEIGHT*2 + nExcesso; // FIXME: tá errado, mas serve
+
+			// DEBUG
+			printf(" para %d\n", nOffsetNow[nIdx]);
+			// Recarrega o tile com algo novo
+			// TODO
+		}
+		
+	}
+	
+	// Ok, move toda a galera na mesma quantidade
+	for(int nIdx = 0; nIdx < RR_RIVER_SCREEN_SLICES; nIdx++) {
+
+		mapSlice[nIdx]->setOffsetY(nOffsetNow[nIdx] + nOffset);
+		// DEBUG
+		//printf("Posicionando slice %d em %d\n", mapSlice[nIdx]->getOffsetY());
+	}
+
+	/*
 
 	// Primeiro, obtém os valores de offset de cada um dos mapas
 	for(int nIdx = 0; nIdx < RR_NUM_ROTATING_MAPS; nIdx++) {
@@ -116,6 +181,7 @@ void PlayState::MoveRotatingMaps(int nOffset) {
 		mapLevel[nIdx]->setOffsetY(nOffsetNow[nIdx] + nOffset);
 	}
 
+	*/
 }
 
 /*****************************************************************************************/
@@ -143,7 +209,7 @@ void PlayState::CarregaSprites() {
 		m_spriteNuvem->loadSprite(nomeArq.c_str(), 128, 128, 0, 0, 0, 0, 1, 1, 1);
 		m_spriteNuvem->setScale(1);
 
-		m_spriteNuvem->setPosition(160-16,320);
+		m_spriteNuvem->setPosition(160-16,200);
 
 		m_spriteNuvem->setAnimRate(8); // taxa de animaÃ§Ã£o em frames por segundo(troca dos frames dele)
 		m_spriteNuvem->setScale(1.0);
@@ -194,8 +260,14 @@ void PlayState::MontaLayer() {
 	layers = new CLayerHandler(5);
 //	layers->add(mapFundo,0);
 	
+	/*
 	for(int nIdx = 0; nIdx < RR_NUM_ROTATING_MAPS; nIdx++)
 		layers->add(mapLevel[nIdx],0);
+	*/
+
+	// Adiciona as 'slices' de mapas a um layer
+	for(int nIdx = 0; nIdx < RR_RIVER_SCREEN_SLICES; nIdx++)
+		layers->add(mapSlice[nIdx],0);
 
 	// FIXME: está com erro no draw do mapa de colisão
 //	layers->add(mapColisao,1);
@@ -205,6 +277,9 @@ void PlayState::MontaLayer() {
 	layers->add(m_spriteChopper,1);	// Adiciona o sprite do helicóptero aos layers
 	layers->add(m_spriteJetplane,1);	// Adiciona o sprite do avião inimigo aos layers
 	layers->add(m_spriteNuvem,3);
+
+	// DEBUG
+	printf(" encerrada com sucesso\n");
 }
 
 /*****************************************************************************************/
@@ -229,6 +304,7 @@ void PlayState::init() {
 	currentFrame = 0;
 
 	// Inicializa a posição dos mapas
+	/*
 	for(int nIdx = 0; nIdx < RR_NUM_ROTATING_MAPS; nIdx++) {
 
 		mapLevel[nIdx]->setStartPosX(0);
@@ -237,6 +313,24 @@ void PlayState::init() {
 
 		// DEBUG
 		printf("Adicionando mapa %d com offset %d\n", nIdx, mapLevel[nIdx]->getOffsetY());
+	}
+	*/
+
+	// Posiciona as 'slices' que compõem um mapa
+	for(int nIdx = 0; nIdx < RR_RIVER_SCREEN_SLICES; nIdx++) {
+
+		// FIXME: MADRE DE DIOS! Quase certo que isso vai dar m...
+
+		mapSlice[nIdx]->setStartPosX(0);
+		mapSlice[nIdx]->setStartPosY(0);
+		
+		// Muito importante! Inicializa o offset de cada slice. Isso é o que realmente a posiciona na tela
+		mapSlice[nIdx]->setOffsetY((RR_GAME_WINDOW_HEIGHT - RR_TILE_HEIGHT) - (nIdx*RR_TILE_HEIGHT));
+
+		mapSlice[nIdx]->mapSliceScramble(nIdx);
+		// DEBUG
+		printf("Posicionando slice %d em %d\n", nIdx, mapSlice[nIdx]->getOffsetY());
+		// Carrega os tiles para o primeiro uso das 'slices'
 	}
 
 	// Inicializa as variáveis do jogo

@@ -45,6 +45,7 @@ class CRiverMap : public CMultiImage {
 		void setStartPosX(int nPos);
 		void setStartPosY(int nPos);
 		void scrambleMap(int nMaxRandom);
+		void mapSliceScramble(int nNum);
 };
 
 #endif

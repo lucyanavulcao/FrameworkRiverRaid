@@ -35,8 +35,9 @@
 #define	RR_GAME_WINDOW_WIDTH		RR_TILE_WIDTH*RR_RIVER_WIDTH
 #define	RR_GAME_WINDOW_HEIGHT		RR_TILE_HEIGHT*RR_RIVER_VISIBLE_HEIGHT
 #define	RR_PLAYER_INIT_POS_X		RR_GAME_WINDOW_WIDTH/2-16	//FIXME
-#define	RR_PLAYER_INIT_POS_Y		RR_TILE_HEIGHT*RR_RIVER_VISIBLE_HEIGHT-(2*RR_TILE_HEIGHT)			//FIXME
-#define RR_NUM_ROTATING_MAPS		3
+#define	RR_PLAYER_INIT_POS_Y		RR_GAME_WINDOW_HEIGHT-(2*RR_TILE_HEIGHT)			//FIXME
+#define RR_NUM_ROTATING_MAPS		3		
+#define RR_RIVER_SCREEN_SLICES	RR_RIVER_VISIBLE_HEIGHT + 2	//! Número de 'fatias' do mapa que são rotacionadas
 
 #define RR_PLAYER_MAX_SPEED			10
 
@@ -93,6 +94,7 @@ class PlayState : public CGameState
 		CLayerHandler *layers;
 		CTilesMap *mapFundo;
 		CTilesMap *mapColisao;
+		CRiverMap *mapSlice[RR_RIVER_SCREEN_SLICES];
 		CRiverMap *mapLevel[RR_NUM_ROTATING_MAPS];
 
 		// Sprites

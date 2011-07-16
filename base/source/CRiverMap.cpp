@@ -228,3 +228,10 @@ void CRiverMap::scrambleMap(int nMaxRandom) {
 
 }
 
+/*************************************************************************/
+void CRiverMap::mapSliceScramble(int nNum) {
+
+	printf("Alterando de %d ", map[0]);
+	map[0] += nNum;
+	printf(" para %d\n", map[0]);
+}
