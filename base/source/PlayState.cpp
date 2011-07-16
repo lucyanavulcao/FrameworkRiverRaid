@@ -106,6 +106,7 @@ void PlayState::MoveRotatingMaps(int nOffset) {
 			// DEBUG
 			printf("Trocando mapa %d - %d/%d/%d\n", nIdx,
 					nOffsetNow[0],nOffsetNow[1],nOffsetNow[2]);
+			break;
 		} 
 	}
 	
@@ -392,7 +393,6 @@ void PlayState::update(CGame* game) {
 	// Move os mapas
 	MoveRotatingMaps(m_nPlayerSpeed);
 
-	
 	// Chama a função de desenho de cada layer
 	layers->draw();
 
