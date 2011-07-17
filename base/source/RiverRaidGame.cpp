@@ -25,6 +25,7 @@ using namespace std;
 #include <SDL_opengl.h>
 #endif
 
+#include "RiverRaidGame.h"
 #include "CGame.h"
 #include "PlayState.h"
 #include "MenuState.h"

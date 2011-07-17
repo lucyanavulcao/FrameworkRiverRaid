@@ -7,6 +7,7 @@
  *
  */
 
+#include "RiverRaidGame.h"
 #include "CGame.h"
 #include "PlayState.h"
 #include "PauseState.h"
@@ -84,8 +85,8 @@ void PlayState::CarregaTiles() {
 
 			// Carrega uma linha básica de tiles, só por questão de inicialização
 			// DEBUG
-		nomeArq = BASE_DIR + "data/maps/river_raid_slice_base.txt";
-			printf("Slice %d\n", nIdx);
+			nomeArq = BASE_DIR + "data/maps/river_raid_slice_base.txt";
+			debug("Slice %d\n", nIdx);
 			mapSlice[nIdx] = new CRiverMap();
 
 			// Carrega o mapa
@@ -134,13 +135,13 @@ void PlayState::MoveRotatingMaps(int nOffset) {
 		if(nOffsetNow[nIdx] >= RR_GAME_WINDOW_HEIGHT) { // Slice saiu da janela, então volta para o ínicio da fila
 			
 			// DEBUG
-			printf("trocando %d! ", nIdx);
+			debug("trocando %d! ", nIdx);
 			// Reposiciona a slice no início da fila
 			int nExcesso = nOffsetNow[nIdx] - RR_GAME_WINDOW_HEIGHT; // Quantos pixels eu passei do fim da tela?
 			nOffsetNow[nIdx] = -RR_TILE_HEIGHT*2 + nExcesso; // FIXME: tá errado, mas serve
 
 			// DEBUG
-			printf(" para %d\n", nOffsetNow[nIdx]);
+			debug(" para %d\n", nOffsetNow[nIdx]);
 			// Recarrega o tile com algo novo
 			// TODO
 		}
@@ -152,7 +153,7 @@ void PlayState::MoveRotatingMaps(int nOffset) {
 
 		mapSlice[nIdx]->setOffsetY(nOffsetNow[nIdx] + nOffset);
 		// DEBUG
-		//printf("Posicionando slice %d em %d\n", mapSlice[nIdx]->getOffsetY());
+		//debug("Posicionando slice %d em %d\n", mapSlice[nIdx]->getOffsetY());
 	}
 
 	/*
@@ -169,7 +170,7 @@ void PlayState::MoveRotatingMaps(int nOffset) {
 		if(nOffsetNow[nIdx] >= RR_GAME_WINDOW_HEIGHT) { // Level saiu da janela, então volta para o ínicio da file
 			nOffsetNow[nIdx] = -RR_RIVER_LEVEL_LENGTH * RR_NUM_ROTATING_MAPS + RR_GAME_WINDOW_HEIGHT;
 			// DEBUG
-			printf("Trocando mapa %d - %d/%d/%d\n", nIdx,
+			debug("Trocando mapa %d - %d/%d/%d\n", nIdx,
 					nOffsetNow[0],nOffsetNow[1],nOffsetNow[2]);
 			break;
 		} 
@@ -279,7 +280,7 @@ void PlayState::MontaLayer() {
 	layers->add(m_spriteNuvem,3);
 
 	// DEBUG
-	printf(" encerrada com sucesso\n");
+	debug(" encerrada com sucesso\n");
 }
 
 /*****************************************************************************************/
@@ -312,7 +313,7 @@ void PlayState::init() {
 		mapLevel[nIdx]->setOffsetY(-RR_RIVER_LEVEL_LENGTH*nIdx); // ... mas com offsets diferentes. Assim ficam em fila
 
 		// DEBUG
-		printf("Adicionando mapa %d com offset %d\n", nIdx, mapLevel[nIdx]->getOffsetY());
+		debug("Adicionando mapa %d com offset %d\n", nIdx, mapLevel[nIdx]->getOffsetY());
 	}
 	*/
 
@@ -329,7 +330,7 @@ void PlayState::init() {
 
 		mapSlice[nIdx]->mapSliceScramble(nIdx);
 		// DEBUG
-		printf("Posicionando slice %d em %d\n", nIdx, mapSlice[nIdx]->getOffsetY());
+		//debug("Posicionando slice %d em %d\n", nIdx, mapSlice[nIdx]->getOffsetY());
 		// Carrega os tiles para o primeiro uso das 'slices'
 	}
 
