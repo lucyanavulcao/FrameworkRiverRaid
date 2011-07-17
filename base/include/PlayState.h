@@ -39,7 +39,9 @@
 #define RR_NUM_ROTATING_MAPS		3		
 #define RR_RIVER_SCREEN_SLICES	RR_RIVER_VISIBLE_HEIGHT + 2	//! Número de 'fatias' do mapa que são rotacionadas
 
-#define RR_PLAYER_MAX_SPEED			10
+#define	RR_PLAYER_MIN_SPEED			1
+#define RR_PLAYER_CRUISE_SPEED	2
+#define RR_PLAYER_MAX_SPEED			4
 
 #include "CGameState.h"
 #include "CImage.h"
@@ -88,6 +90,7 @@ class PlayState : public CGameState
 		bool TemColisaoSpriteTile(CSprite *sprite, CTilesMap *map);
 		void CriaMapDeColisao();
 		void MoveRotatingMaps(int nOffset);
+		void MapLoadNewSlice(int nMapSliceIdx, int nRiverLevel, int nLevelSlice);
 
 	private:
 		static PlayState m_PlayState;
@@ -108,6 +111,9 @@ class PlayState : public CGameState
 		int	m_nPlayerSpeed;
 		long m_lnPlayerScore;
 		int m_nLevel;		//!	Fase atual em que o jogador se encontra
+		int m_nLevelSlice;
+		int m_nRiverLevel;
+
 
 		Uint8* keystate; // state of all keys (1 means key is pressed)
 

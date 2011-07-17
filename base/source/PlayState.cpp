@@ -86,7 +86,6 @@ void PlayState::CarregaTiles() {
 			// Carrega uma linha básica de tiles, só por questão de inicialização
 			// DEBUG
 			nomeArq = BASE_DIR + "data/maps/river_raid_slice_base.txt";
-			debug("Slice %d\n", nIdx);
 			mapSlice[nIdx] = new CRiverMap();
 
 			// Carrega o mapa
@@ -135,15 +134,26 @@ void PlayState::MoveRotatingMaps(int nOffset) {
 		if(nOffsetNow[nIdx] >= RR_GAME_WINDOW_HEIGHT) { // Slice saiu da janela, então volta para o ínicio da fila
 			
 			// DEBUG
-			debug("trocando %d! ", nIdx);
 			// Reposiciona a slice no início da fila
 			int nExcesso = nOffsetNow[nIdx] - RR_GAME_WINDOW_HEIGHT; // Quantos pixels eu passei do fim da tela?
-			nOffsetNow[nIdx] = -RR_TILE_HEIGHT*2 + nExcesso; // FIXME: tá errado, mas serve
+			nOffsetNow[nIdx] = -RR_TILE_HEIGHT*2 + nExcesso; // Reposiciona a fatia na parte superior de novo
+
+			m_nLevelSlice++; // Avançamos mais um slice
+			if(m_nLevelSlice == RR_RIVER_HEIGHT) { // Avançamos uma seção inteira do rio!
+
+				m_nRiverLevel++; // Avançamos um level
+				m_nLevelSlice = 0; // Resetamos o slice
+
+				// DEBUG
+				debug("Level %d slice %d", m_nRiverLevel, m_nLevelSlice);
+			}
 
 			// DEBUG
-			debug(" para %d\n", nOffsetNow[nIdx]);
+			debug("Trocando %d para %d [slice %d]", nIdx, nOffsetNow[nIdx], m_nLevelSlice);
+
 			// Recarrega o tile com algo novo
-			// TODO
+			MapLoadNewSlice(nIdx, m_nRiverLevel, m_nLevelSlice);
+
 		}
 		
 	}
@@ -183,6 +193,33 @@ void PlayState::MoveRotatingMaps(int nOffset) {
 	}
 
 	*/
+}
+
+/*****************************************************************************************/
+/*
+ * @brief		Função que carrega uma nova linha (slice) do rio, conforme o level
+ * @param		nMapSliceIdx		Índice da slice onde será colocado o novo mapa, para após ser mostrado em tela
+ * @param		nRiverLevel			Level em que estamos no rio
+ * @param		nLevelSlice			Índice da slice no comprimento do rio (lembrar: 0..31)
+ * @return	void
+ */
+void PlayState::MapLoadNewSlice(int nMapSliceIdx, int nRiverLevel, int nLevelSlice) {
+
+	std::vector<int> vSlice;
+
+	// FIXME: só está aqui para dar uma palinha de como funcionaria
+	switch(nRiverLevel) {
+		case 1:
+			vSlice = mapLevel[1]->getTileLine(nLevelSlice);
+			if(!mapSlice[nMapSliceIdx]->putTileLine(vSlice, 0)) {
+				debug("Opa! Erro na cópia de slices!");
+			}
+			break;
+		case 2:
+			break;
+		case 3:
+			break;
+	}
 }
 
 /*****************************************************************************************/
@@ -336,8 +373,9 @@ void PlayState::init() {
 
 	// Inicializa as variáveis do jogo
 	m_lnPlayerScore = 0;
-	m_nLevel = 0;	// Primeira fase
-	m_nPlayerSpeed = 1; // FIXME: a velocidade inicial do avião não será controlada assim...
+	m_nPlayerSpeed = 2; // FIXME: a velocidade inicial do avião não será controlada assim...
+	m_nLevelSlice = 0;
+	m_nRiverLevel = 1;	// Primeira fase
 
 	cout << "PlayState Init Successful" << endl;
 }

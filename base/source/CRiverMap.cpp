@@ -132,6 +132,7 @@ int CRiverMap::getTileNumber(int col, int lin) // x, y
 	return map[lin*widthTileMap+col] + 1; // // este +1 est√° aqui pois as sprites do TMX iniciam em 1
 }
 
+/*************************************************************************/
 /*
  * @brief	Retorna a string com uma linha completa do mapa
  * @param
@@ -149,6 +150,27 @@ std::vector<int> CRiverMap::getTileLine(int nLine) {
 	return vLinhaMapa;
 }
 
+/*************************************************************************/
+/*
+ * @brief		Copia uma nova linha de tiles para a linha especificada do mapa
+ * @param		vLine		Vetor com os novos tiles
+ * @param		nLine		Linha do mapa onde ser„o inseridos os novos tiles
+ * @return	true se ok, false se a linhas n„o tem o mesmo tamanho
+ */
+bool CRiverMap::putTileLine(std::vector<int> vLine, int nLine) {
+
+	int nStartPos = nLine * widthTileMap;
+
+	if(vLine.size() != widthTileMap) // Linhas tem tamanhos diferentes
+		return false;
+
+	for(int nCol = 0; nCol < widthTileMap; nCol++) {
+
+		map[nStartPos+nCol] = vLine[nCol];
+	}
+
+	return true;
+}
 
 /*************************************************************************/
 /*
@@ -235,3 +257,4 @@ void CRiverMap::mapSliceScramble(int nNum) {
 	map[0] += nNum;
 	printf(" para %d\n", map[0]);
 }
+

@@ -46,6 +46,7 @@ class CRiverMap : public CMultiImage {
 		void setStartPosY(int nPos);
 		void scrambleMap(int nMaxRandom);
 		void mapSliceScramble(int nNum);
+		bool putTileLine(std::vector<int> vLine, int nLine);
 };
 
 #endif
