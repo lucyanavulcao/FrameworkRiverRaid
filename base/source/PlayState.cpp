@@ -26,8 +26,12 @@ void PlayState::CarregaTiles() {
 	{
 		for(int nIdx = 0; nIdx < RR_NUM_ROTATING_MAPS; nIdx++) {
 			// 1 - Arquivo com a descrição do mapa de tiles
-			if(nIdx)
-				nomeArq = BASE_DIR + "data/maps/river_raid_base.txt";
+			if(nIdx) {
+				if(nIdx % 2)
+					nomeArq = BASE_DIR + "data/maps/river_raid_base.txt";
+				else
+					nomeArq = BASE_DIR + "data/maps/river_raid_base_2.txt";
+			}
 			else
 				nomeArq = BASE_DIR + "data/maps/river_raid_level_0.txt";
 
@@ -133,7 +137,6 @@ void PlayState::MoveRotatingMaps(int nOffset) {
 		
 		if(nOffsetNow[nIdx] >= RR_GAME_WINDOW_HEIGHT) { // Slice saiu da janela, então volta para o ínicio da fila
 			
-			// DEBUG
 			// Reposiciona a slice no início da fila
 			int nExcesso = nOffsetNow[nIdx] - RR_GAME_WINDOW_HEIGHT; // Quantos pixels eu passei do fim da tela?
 			nOffsetNow[nIdx] = -RR_TILE_HEIGHT*2 + nExcesso; // Reposiciona a fatia na parte superior de novo
@@ -207,27 +210,41 @@ void PlayState::MapLoadNewSlice(int nMapSliceIdx, int nRiverLevel, int nLevelSli
 
 	std::vector<int> vSlice;
 
-	// FIXME: só está aqui para dar uma palinha de como funcionaria
-	switch(nRiverLevel) {
-		case 1:
-			vSlice = mapLevel[1]->getTileLine(nLevelSlice);
-			if(!mapSlice[nMapSliceIdx]->putTileLine(vSlice, 0)) {
-				debug("Opa! Erro na cópia de slices!");
+	debug("[nMapSliceIdx %d, nRiverLevel %d, nLevelSlice %d-%d", 
+			nMapSliceIdx, nRiverLevel, nLevelSlice, RR_RIVER_HEIGHT-nLevelSlice-1);
+
+	if(GetCurrState() == STATE_STARTING_LEVEL) {
+		// Estamos começando uma fase ou reiniciando depois de morrer. Assim, o mapa
+		// antes da fase sempre é reto, sem inimigos e da mesma cor
+		vSlice = mapLevel[0]->getTileLine(RR_RIVER_HEIGHT - nLevelSlice - 1);
+		if(!mapSlice[nMapSliceIdx]->putTileLine(vSlice, 0)) {
+			debug("Opa! Erro na cópia de slices!");
 			}
-			break;
-		case 2:
-			vSlice = mapLevel[2]->getTileLine(nLevelSlice);
-			if(!mapSlice[nMapSliceIdx]->putTileLine(vSlice, 0)) {
-				debug("Opa! Erro na cópia de slices!");
-			}
-			break;
-		case 3:
-			vSlice = mapLevel[0]->getTileLine(nLevelSlice);
-			if(!mapSlice[nMapSliceIdx]->putTileLine(vSlice, 0)) {
-				debug("Opa! Erro na cópia de slices!");
-			}
-			break;
 	}
+	else {
+		// O jogo está rolando normalmente. Variamos as fases
+		int nThisLevelMap = nRiverLevel % 2;
+
+		switch(nThisLevelMap) {
+			case 0:
+				vSlice = mapLevel[1]->getTileLine(RR_RIVER_HEIGHT - nLevelSlice - 1);
+				if(!mapSlice[nMapSliceIdx]->putTileLine(vSlice, 0)) {
+					debug("Opa! Erro na cópia de slices!");
+				}
+				break;
+
+			case 1:
+				vSlice = mapLevel[2]->getTileLine(RR_RIVER_HEIGHT - nLevelSlice-1);
+				if(!mapSlice[nMapSliceIdx]->putTileLine(vSlice, 0)) {
+					debug("Opa! Erro na cópia de slices!");
+				}
+				break;
+			default:
+				break;
+		}
+
+	}
+
 }
 
 /*****************************************************************************************/
@@ -266,6 +283,11 @@ void PlayState::MapStartLevel(int nLevel) {
 
 	// 1 - Arrumar os offsets! A slice 0 (ponte) tem que começar no início da tela
 	MapStartLevelResetOffsets();
+
+	// 2 - Slices posicionados. Agora, ajusta os tiles das primeiras fatias
+	int nDiferenca = RR_RIVER_SCREEN_SLICES - RR_RIVER_VISIBLE_HEIGHT;
+	for(int nIdx = 0; nIdx <= nDiferenca ; nIdx++)
+		MapLoadNewSlice(nIdx, m_nRiverLevel, nIdx);
 
 }
 
@@ -413,7 +435,7 @@ void PlayState::init() {
 	m_lnPlayerScore = 0;
 	m_nPlayerSpeed = 2; // FIXME: a velocidade inicial do avião não será controlada assim...
 	m_nLevelSlice = 0;
-	m_nRiverLevel = 1;	// Primeira fase
+	m_nRiverLevel = 0;	// Primeira fase
 
 	// Inicializa um estado na máquina de estados
 	EnterNewState(STATE_STARTING_GAME);
@@ -702,6 +724,7 @@ void PlayState::LeaveCurrState() {
 			break;
 
 		case STATE_STARTING_LEVEL:
+			m_nRiverLevel = 1; // Agora começamos na primeira fase do jogo
 			break;
 
 		case STATE_PLAYING:
