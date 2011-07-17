@@ -21,9 +21,25 @@
 #include <SDL_opengl.h>
 #endif
 
+#include "CGameState.h"
+#include "CImage.h"
+#include "CSprite.h"
+#include "CLayerHandler.h"
+#include "CTilesMap.h"
+#include "CFont.h"
+#include "CTiro.h"
+#include "CRiverMap.h"
+#include <irrKlang.h>
+
+#include <vector>
+#include <cstdlib>
+#include <iostream>
+#include <cstring>
+#include <sstream>
+
 /*****************************************************************************************/
 /*
- * Defines do jogo
+ * 	Defines do jogo
  */
 /*****************************************************************************************/
 #define	RR_TILE_WIDTH						32	// Largura de cada tile que compõe o cenário
@@ -43,21 +59,16 @@
 #define RR_PLAYER_CRUISE_SPEED	2
 #define RR_PLAYER_MAX_SPEED			4
 
-#include "CGameState.h"
-#include "CImage.h"
-#include "CSprite.h"
-#include "CLayerHandler.h"
-#include "CTilesMap.h"
-#include "CFont.h"
-#include "CTiro.h"
-#include "CRiverMap.h"
-#include <irrKlang.h>
-
-#include <vector>
-#include <cstdlib>
-#include <iostream>
-#include <cstring>
-#include <sstream>
+/*****************************************************************************************/
+/*
+ *	Máquina de estados do jogo
+ */
+enum EPlayState {
+	STATE_STARTING_GAME,
+	STATE_STARTING_LEVEL,	//<	Iniciando uma fase, faz a animação do rio e deixa o player parado
+	STATE_PLAYING,				//< Player jogando
+	STATE_NULL
+};
 
 using namespace std;
 
@@ -80,6 +91,13 @@ class PlayState : public CGameState
 		{
 			return &m_PlayState;
 		}
+		
+		// Métodos da máquina de estados do jogo
+		EPlayState GetCurrState(void);
+		EPlayState GetPrevState(void);
+		void EnterNewState(EPlayState eNewState);
+		void ExecuteCurrState();
+		void LeaveCurrState();
 
 
 	protected:
@@ -91,6 +109,10 @@ class PlayState : public CGameState
 		void CriaMapDeColisao();
 		void MoveRotatingMaps(int nOffset);
 		void MapLoadNewSlice(int nMapSliceIdx, int nRiverLevel, int nLevelSlice);
+		void MapStartLevel(int nLevel);
+		void MapStartLevelResetOffsets(void);
+
+		EPlayState m_eCurrState, m_ePrevState;
 
 	private:
 		static PlayState m_PlayState;
@@ -113,6 +135,11 @@ class PlayState : public CGameState
 		int m_nLevel;		//!	Fase atual em que o jogador se encontra
 		int m_nLevelSlice;
 		int m_nRiverLevel;
+		bool m_bnPlayerHasStarted;
+
+		// Variáveis auxiliares
+		int m_nAuxSlice;
+		int m_nAuxRolagem;
 
 
 		Uint8* keystate; // state of all keys (1 means key is pressed)

@@ -216,10 +216,57 @@ void PlayState::MapLoadNewSlice(int nMapSliceIdx, int nRiverLevel, int nLevelSli
 			}
 			break;
 		case 2:
+			vSlice = mapLevel[2]->getTileLine(nLevelSlice);
+			if(!mapSlice[nMapSliceIdx]->putTileLine(vSlice, 0)) {
+				debug("Opa! Erro na cópia de slices!");
+			}
 			break;
 		case 3:
+			vSlice = mapLevel[0]->getTileLine(nLevelSlice);
+			if(!mapSlice[nMapSliceIdx]->putTileLine(vSlice, 0)) {
+				debug("Opa! Erro na cópia de slices!");
+			}
 			break;
 	}
+}
+
+/*****************************************************************************************/
+/*
+ * @brief		Esta função reposiciona os slices da seguinte forma: a primeira linha do mapa (ponte) fica no 
+ * 					início da tela. Acima dela ficam duas linhas de buffer, e as demais se posicionam do fim da 
+ * 					janela para cima.
+ * 					Isso é necessário para o efeito de rolagem quando o jogador inicia um jogo ou recomeça uma vida
+ * @param		void
+ * @return	void
+ */
+void PlayState::MapStartLevelResetOffsets(void) {
+
+	int nDiferenca = RR_RIVER_SCREEN_SLICES - RR_RIVER_VISIBLE_HEIGHT;
+
+	for(int nIdx = 0; nIdx < RR_RIVER_SCREEN_SLICES; nIdx++) {
+
+		if(nIdx <= nDiferenca ) 
+			mapSlice[nIdx]->setOffsetY(nIdx * -RR_TILE_HEIGHT); // Tiles excedentes ficam acima da tela
+		else
+			mapSlice[nIdx]->setOffsetY(RR_GAME_WINDOW_HEIGHT - (nIdx-nDiferenca)*RR_TILE_HEIGHT); 
+
+		// DEBUG
+		debug("Slice %d: offset %d", nIdx, mapSlice[nIdx]->getOffsetY());
+	}
+}
+
+/*****************************************************************************************/
+/*
+ * @brief		Função que faz o início de fase quando o player inicia uma nova vida ou jogo.
+ * 					A parte da ponte deve rolar do início da tela até a posição onde o player inicia.
+ * @param		
+ * @return	void
+ */
+void PlayState::MapStartLevel(int nLevel) {
+
+	// 1 - Arrumar os offsets! A slice 0 (ponte) tem que começar no início da tela
+	MapStartLevelResetOffsets();
+
 }
 
 /*****************************************************************************************/
@@ -331,6 +378,10 @@ void PlayState::init() {
 	BASE_DIR = "../../../../bin/"; // Visual Studio
 #endif
   firstTime = true;
+
+	// Inicializa a máquina de estados do jogo
+	m_eCurrState = m_ePrevState = STATE_NULL;
+
 	CarregaTiles();
 	CarregaSprites();
 	MontaLayer();
@@ -340,19 +391,6 @@ void PlayState::init() {
 	keystate = SDL_GetKeyState(NULL); // get array of key states
 
 	currentFrame = 0;
-
-	// Inicializa a posição dos mapas
-	/*
-	for(int nIdx = 0; nIdx < RR_NUM_ROTATING_MAPS; nIdx++) {
-
-		mapLevel[nIdx]->setStartPosX(0);
-		mapLevel[nIdx]->setStartPosY(0); // Todos os mapas são iniciados na origem...
-		mapLevel[nIdx]->setOffsetY(-RR_RIVER_LEVEL_LENGTH*nIdx); // ... mas com offsets diferentes. Assim ficam em fila
-
-		// DEBUG
-		debug("Adicionando mapa %d com offset %d\n", nIdx, mapLevel[nIdx]->getOffsetY());
-	}
-	*/
 
 	// Posiciona as 'slices' que compõem um mapa
 	for(int nIdx = 0; nIdx < RR_RIVER_SCREEN_SLICES; nIdx++) {
@@ -376,6 +414,9 @@ void PlayState::init() {
 	m_nPlayerSpeed = 2; // FIXME: a velocidade inicial do avião não será controlada assim...
 	m_nLevelSlice = 0;
 	m_nRiverLevel = 1;	// Primeira fase
+
+	// Inicializa um estado na máquina de estados
+	EnterNewState(STATE_STARTING_GAME);
 
 	cout << "PlayState Init Successful" << endl;
 }
@@ -452,13 +493,9 @@ void PlayState::handleEvents(CGame* game) {
 		if(m_nPlayerSpeed > RR_PLAYER_MAX_SPEED)
 			m_nPlayerSpeed = RR_PLAYER_MAX_SPEED;
 
-		// Movimenta o avião e faz o pan da câmera, movendo também o cenário
-		//m_spritePlayer->setY(m_spritePlayer->getY()-m_nPlayerSpeed);
-		//game->setYpan(game->getYpan()-2);
-		//game->updateCamera();
+		if(m_bnPlayerHasStarted == false)
+			m_bnPlayerHasStarted = true;
 
-		/*game->setZoom(game->getZoom()+1);
-			game->updateCamera();*/
 	}
 
 	if (keystate[SDLK_DOWN]==1) {
@@ -468,28 +505,23 @@ void PlayState::handleEvents(CGame* game) {
 		if(m_nPlayerSpeed <=1)
 			m_nPlayerSpeed = 1;
 
-		// FIXME: não fazer mais o pan de câmera e sim diminuir a velocidade do avião
-		// Movimenta o avião e faz o pan da câmera, movendo também o cenário
-		//m_spritePlayer->setY(m_spritePlayer->getY()+2);
-		//game->setYpan(game->getYpan()+2);
-		//game->updateCamera();
-		/*game->setZoom(game->getZoom()-1);
-		game->updateCamera();*/
+		if(m_bnPlayerHasStarted == false)
+			m_bnPlayerHasStarted = true;
 	}
 
 	if (keystate[SDLK_RIGHT]==1) {
 		// FIXME: está fazendo pan
-//		if (!TemColisaoSpriteTile(m_spritePlayer,mapColisao))
-			m_spritePlayer->setX(m_spritePlayer->getX()+1);
-		/*game->setXpan(game->getXpan()+1);
-		game->updateCamera();*/
+		//		if (!TemColisaoSpriteTile(m_spritePlayer,mapColisao))
+		m_spritePlayer->setX(m_spritePlayer->getX()+1);
+		if(m_bnPlayerHasStarted == false)
+			m_bnPlayerHasStarted = true;
 	}
 
 	if (keystate[SDLK_LEFT]==1) {
-	//	if (!TemColisaoSpriteTile(m_spritePlayer,mapColisao))
-			m_spritePlayer->setX(m_spritePlayer->getX()-1);
-		/*game->setXpan(game->getXpan()-1);
-		game->updateCamera();*/
+		//	if (!TemColisaoSpriteTile(m_spritePlayer,mapColisao))
+		m_spritePlayer->setX(m_spritePlayer->getX()-1);
+		if(m_bnPlayerHasStarted == false)
+			m_bnPlayerHasStarted = true;
 	}
 
 	if(keystate[SDLK_l]==1) {
@@ -499,6 +531,7 @@ void PlayState::handleEvents(CGame* game) {
 	}
 
 	if(keystate[SDLK_SPACE]==1) {
+		// TODO: adicionar lógica para tiro
 	}
 
 
@@ -514,17 +547,13 @@ void PlayState::update(CGame* game) {
 		game->getAudioEngine()->play2D(initSound,true);
 	}
 
+	// Executa o estado atual da Máquina de Estados
+	ExecuteCurrState();
+
 	m_spritePlayer->update(game->getUpdateInterval());
 
 	// Faz a animação dos sprites na tela
 	m_spriteChopper->update(game->getUpdateInterval());
-
-
-	//game->setXpan(m_spritePlayer->getX() - game->getWidth()/2);
-	//game->updateCamera();
-	
-	// Move os mapas
-	MoveRotatingMaps(m_nPlayerSpeed);
 
 	// Chama a função de desenho de cada layer
 	layers->draw();
@@ -585,4 +614,100 @@ void PlayState::CriaMapDeColisao() {
 		y += mapColisao->getHeight();
 	}
 
+}
+
+
+/*
+ * ========================================================================================
+ * DEFINICOES DA MAQUINA DE ESTADOS
+ * ========================================================================================
+ */
+
+/*****************************************************************************************/
+EPlayState PlayState::GetCurrState(void) {
+	return m_eCurrState;
+}
+
+/*****************************************************************************************/
+EPlayState PlayState::GetPrevState(void) {
+	return m_ePrevState;
+}
+
+/*****************************************************************************************/
+void PlayState::EnterNewState(EPlayState eNewState) {
+
+	LeaveCurrState();
+	m_ePrevState = m_eCurrState;
+	m_eCurrState = eNewState;
+
+	switch(GetCurrState()) {
+
+		case STATE_STARTING_GAME:
+			m_bnPlayerHasStarted = false; // Player começa parado
+			break;
+
+		case STATE_STARTING_LEVEL:
+			m_bnPlayerHasStarted = false; // Player começa parado
+			m_nAuxSlice = 0;
+			m_nAuxRolagem = (RR_RIVER_VISIBLE_HEIGHT-2)*RR_TILE_HEIGHT;
+			MapStartLevel(m_nRiverLevel);
+			break;
+
+		case STATE_PLAYING:
+			m_bnPlayerHasStarted = false;
+			break;
+
+		default:
+			break;
+	}
+}
+
+/*****************************************************************************************/
+void PlayState::ExecuteCurrState() {
+	
+	switch(GetCurrState()) {
+
+		case STATE_STARTING_GAME:
+			// Inicializa as variáveis de uma partida
+
+			EnterNewState(STATE_STARTING_LEVEL); // Começamos o jogo
+			break;
+
+		case STATE_STARTING_LEVEL:
+			// Rola o mapa até o jogador
+			m_nAuxSlice+=RR_PLAYER_CRUISE_SPEED;
+			if(m_nAuxSlice >= m_nAuxRolagem)
+				EnterNewState(STATE_PLAYING);
+			else
+				MoveRotatingMaps(RR_PLAYER_CRUISE_SPEED);
+			break;
+
+		case STATE_PLAYING:
+			// Faz o scroll do mapa conforme a velocidade do jogador
+			if(m_bnPlayerHasStarted)
+				MoveRotatingMaps(m_nPlayerSpeed);
+			break;
+
+		default:
+			break;
+	}
+}
+
+/*****************************************************************************************/
+void PlayState::LeaveCurrState() {
+
+	switch(GetCurrState()) {
+
+		case STATE_STARTING_GAME:
+			break;
+
+		case STATE_STARTING_LEVEL:
+			break;
+
+		case STATE_PLAYING:
+			break;
+
+		default:
+			break;
+	}
 }
