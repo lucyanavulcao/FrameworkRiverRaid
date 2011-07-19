@@ -59,6 +59,26 @@
 #define RR_PLAYER_CRUISE_SPEED	2
 #define RR_PLAYER_MAX_SPEED			4
 
+#define RR_START_ENEMY_TILES		49	//! Índice do primeiro tile que indica a posição de um inimigo no mapa
+
+/*****************************************************************************************/
+/*
+ * Tiles do mapa que indicam as posições dos itens
+ */
+enum EEnemyTiles {
+		FUEL =	RR_START_ENEMY_TILES,
+		SHIP_R,
+		SHIP_L,
+		CHOPPER_R,
+		CHOPPER_L,
+		JET_R,
+		JET_L,
+		BRIDGE,
+		HOUSE_R,
+		HOUSE_L,
+};
+
+
 /*****************************************************************************************/
 /*
  *	Máquina de estados do jogo
@@ -111,6 +131,7 @@ class PlayState : public CGameState
 		void MapLoadNewSlice(int nMapSliceIdx, int nRiverLevel, int nLevelSlice);
 		void MapStartLevel(int nLevel);
 		void MapStartLevelResetOffsets(void);
+		void TileLineProcess(std::vector<int>* vLine, int nSliceIdx);
 
 		EPlayState m_eCurrState, m_ePrevState;
 

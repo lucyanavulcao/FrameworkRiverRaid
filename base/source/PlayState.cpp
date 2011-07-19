@@ -28,7 +28,7 @@ void PlayState::CarregaTiles() {
 			// 1 - Arquivo com a descrição do mapa de tiles
 			if(nIdx) {
 				if(nIdx % 2)
-					nomeArq = BASE_DIR + "data/maps/river_raid_base.txt";
+					nomeArq = BASE_DIR + "data/maps/mapa_level_00.txt";
 				else
 					nomeArq = BASE_DIR + "data/maps/river_raid_base_2.txt";
 			}
@@ -49,8 +49,8 @@ void PlayState::CarregaTiles() {
 					32, 32,		// int w, int h,
 					0, 0, 		// int hSpace, int vSpace,
 					0, 0, 		// int xIni, int yIni,
-					8, 6, 	// int column, int row,
-					48);		// int total
+					8, 8, 	// int column, int row,
+					64);		// int total
 
 			if (!ret) {
 				cout << "Arquivo de tiles ("<< nomeArq << ") não existe." ;
@@ -105,8 +105,8 @@ void PlayState::CarregaTiles() {
 					32, 32,		// int w, int h,
 					0, 0, 		// int hSpace, int vSpace,
 					0, 0, 		// int xIni, int yIni,
-					8, 6, 	// int column, int row,
-					48);		// int total
+					8, 8, 	// int column, int row,
+					64);		// int total
 
 			if (!ret) {
 				cout << "Arquivo de tiles ("<< nomeArq << ") não existe." ;
@@ -152,7 +152,7 @@ void PlayState::MoveRotatingMaps(int nOffset) {
 			}
 
 			// DEBUG
-			debug("Trocando %d para %d [slice %d]", nIdx, nOffsetNow[nIdx], m_nLevelSlice);
+			//debug("Trocando %d para %d [slice %d]", nIdx, nOffsetNow[nIdx], m_nLevelSlice);
 
 			// Recarrega o tile com algo novo
 			MapLoadNewSlice(nIdx, m_nRiverLevel, m_nLevelSlice);
@@ -210,8 +210,8 @@ void PlayState::MapLoadNewSlice(int nMapSliceIdx, int nRiverLevel, int nLevelSli
 
 	std::vector<int> vSlice;
 
-	debug("[nMapSliceIdx %d, nRiverLevel %d, nLevelSlice %d-%d", 
-			nMapSliceIdx, nRiverLevel, nLevelSlice, RR_RIVER_HEIGHT-nLevelSlice-1);
+	//debug("[nMapSliceIdx %d, nRiverLevel %d, nLevelSlice %d-%d", 
+	//		nMapSliceIdx, nRiverLevel, nLevelSlice, RR_RIVER_HEIGHT-nLevelSlice-1);
 
 	//if(GetCurrState() == STATE_STARTING_LEVEL) {
 	//	// Estamos começando uma fase ou reiniciando depois de morrer. Assim, o mapa
@@ -229,6 +229,7 @@ void PlayState::MapLoadNewSlice(int nMapSliceIdx, int nRiverLevel, int nLevelSli
 		switch(nThisLevelMap) {
 			case 0:
 				vSlice = mapLevel[1]->getTileLine(RR_RIVER_HEIGHT - nLevelSlice - 1);
+				TileLineProcess(&vSlice, nMapSliceIdx);
 				if(!mapSlice[nMapSliceIdx]->putTileLine(vSlice, 0)) {
 					debug("Opa! Erro na cópia de slices!");
 				}
@@ -269,7 +270,8 @@ void PlayState::MapStartLevelResetOffsets(void) {
 			mapSlice[nIdx]->setOffsetY(RR_GAME_WINDOW_HEIGHT - (nIdx-nDiferenca)*RR_TILE_HEIGHT); 
 
 		// DEBUG
-		debug("Slice %d: offset %d", nIdx, mapSlice[nIdx]->getOffsetY());
+		//debug("Slice %d: offset %d", nIdx, mapSlice[nIdx]->getOffsetY());
+
 	}
 }
 
@@ -302,6 +304,41 @@ void PlayState::MapStartLevel(int nLevel) {
 	}		
 	
 
+
+}
+
+/*****************************************************************************************/
+/*
+ * @brief		Faz o processamento dos índice de tiles, convertendo os tiles de posição de 
+ * 					inimigos pelos tile de fundo
+ * @param		*vLine		Ponteiro para o vector que contém os tiles desta linha
+ * @param		nSliceIdx	Índice para a fatia na tela
+ */
+void PlayState::TileLineProcess(std::vector<int>* vLine, int nSliceIdx) {
+	
+	int nPosY =	mapSlice[nSliceIdx]->getOffsetY(); 
+
+	for(int nIdx = 0; nIdx < vLine->size(); nIdx++) {
+		int nTile = vLine->at(nIdx);
+
+		if( nTile >= RR_START_ENEMY_TILES) {
+			// Obtém a posição x e y deste tile e desta linha
+			int nPosX = nIdx * RR_TILE_WIDTH;
+
+
+			// substitui o marcador pelo tile adequado
+			vLine->at(nIdx) = 31;
+
+			if(nTile == BRIDGE && GetCurrState() == STATE_STARTING_LEVEL) {
+				debug("Ignorando ponte.");
+			}
+			else {
+				debug("Adicionando novo item %d em [%d,%d]", nTile, nPosX, nPosY);
+			}
+
+
+		}
+	}	
 
 }
 
