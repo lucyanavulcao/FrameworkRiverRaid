@@ -59,7 +59,7 @@
 #define RR_PLAYER_CRUISE_SPEED	2
 #define RR_PLAYER_MAX_SPEED			4
 
-#define RR_START_ENEMY_TILES		49	//! Índice do primeiro tile que indica a posição de um inimigo no mapa
+#define RR_START_ENEMY_TILES		48	//! Índice do primeiro tile que indica a posição de um inimigo no mapa
 
 /*****************************************************************************************/
 /*
@@ -157,6 +157,7 @@ class PlayState : public CGameState
 		int m_nLevelSlice;
 		int m_nRiverLevel;
 		bool m_bnPlayerHasStarted;
+		std::vector<int> m_vnSlicesIdxForCollision;
 
 		// Variáveis auxiliares
 		int m_nAuxSlice;

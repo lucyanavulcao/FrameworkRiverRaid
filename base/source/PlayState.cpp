@@ -162,40 +162,28 @@ void PlayState::MoveRotatingMaps(int nOffset) {
 	}
 	
 	// Ok, move toda a galera na mesma quantidade
+	m_vnSlicesIdxForCollision.clear();
+	int nSliceY;
 	for(int nIdx = 0; nIdx < RR_RIVER_SCREEN_SLICES; nIdx++) {
 
-		mapSlice[nIdx]->setOffsetY(nOffsetNow[nIdx] + nOffset);
+		nSliceY = nOffsetNow[nIdx] + nOffset;
+		mapSlice[nIdx]->setOffsetY(nSliceY);
+
 		// DEBUG
-		//debug("Posicionando slice %d em %d\n", mapSlice[nIdx]->getOffsetY());
-	}
+		//debug("Posicionando slice %d em %d\n", nIdx, nSliceY);
 
-	/*
+		// De quebra, já olhamos em quem devemos testar as colisões
+		if( !(nSliceY+RR_TILE_HEIGHT < RR_PLAYER_INIT_POS_Y || RR_PLAYER_INIT_POS_Y+RR_TILE_HEIGHT	< nSliceY))	{
+			// Ok, esta linha está na mesma faixa que o player! Adicionada ao vetor
+			m_vnSlicesIdxForCollision.push_back(nIdx);
 
-	// Primeiro, obtém os valores de offset de cada um dos mapas
-	for(int nIdx = 0; nIdx < RR_NUM_ROTATING_MAPS; nIdx++) {
-		nOffsetNow[nIdx] = mapLevel[nIdx]->getOffsetY();
-	}
-
-	// Processa os offsets, verificando se algum dos mapas saiu da janela. Se saiu, faz a devida rotação
-	// FIXME: ALERTA DE TOSQUICE!!! Melhorar esse código, usar o define RR_NUM_ROTATING_MAPS
-	for(int nIdx=0; nIdx<RR_NUM_ROTATING_MAPS; nIdx++) {
-
-		if(nOffsetNow[nIdx] >= RR_GAME_WINDOW_HEIGHT) { // Level saiu da janela, então volta para o ínicio da file
-			nOffsetNow[nIdx] = -RR_RIVER_LEVEL_LENGTH * RR_NUM_ROTATING_MAPS + RR_GAME_WINDOW_HEIGHT;
 			// DEBUG
-			debug("Trocando mapa %d - %d/%d/%d\n", nIdx,
-					nOffsetNow[0],nOffsetNow[1],nOffsetNow[2]);
-			break;
-		} 
+			debug("Testar slice de tela %d em %d(%d) [mapa: %d]para colisao!", nIdx, nSliceY, RR_PLAYER_INIT_POS_Y, m_nLevelSlice);
+		}
+
 	}
+
 	
-	// Faz a movimentação dos mapas
-	for(int nIdx = 0; nIdx < RR_NUM_ROTATING_MAPS; nIdx++) {
-
-		mapLevel[nIdx]->setOffsetY(nOffsetNow[nIdx] + nOffset);
-	}
-
-	*/
 }
 
 /*****************************************************************************************/
@@ -721,6 +709,7 @@ void PlayState::EnterNewState(EPlayState eNewState) {
 			m_bnPlayerHasStarted = false; // Player começa parado
 			m_nAuxSlice = 0;
 			m_nAuxRolagem = (RR_RIVER_VISIBLE_HEIGHT+1)*RR_TILE_HEIGHT;
+			m_vnSlicesIdxForCollision.clear();	// Limpa o vetor de colisões com o cenário
 			MapStartLevel(m_nRiverLevel);
 			break;
 
@@ -782,3 +771,4 @@ void PlayState::LeaveCurrState() {
 			break;
 	}
 }
+
